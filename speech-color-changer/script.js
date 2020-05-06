@@ -9,7 +9,7 @@ var recognition = new SpeechRecognition();
 var speechRecognitionList = new SpeechGrammarList();
 speechRecognitionList.addFromString(grammar, 1);
 recognition.grammars = speechRecognitionList;
-recognition.continuous = false;
+recognition.continuous = true;
 recognition.lang = 'en-US';
 recognition.interimResults = false;
 recognition.maxAlternatives = 1;
@@ -39,14 +39,11 @@ recognition.onresult = function(event) {
   // These also have getters so they can be accessed like arrays.
   // The second [0] returns the SpeechRecognitionAlternative at position 0.
   // We then return the transcript property of the SpeechRecognitionAlternative object
-  var color = event.results[0][0].transcript;
+  var len = event.results.length;
+  var color = event.results[len-1][0].transcript;
   diagnostic.textContent = 'Result received: ' + color + '.';
   bg.style.backgroundColor = color;
-  console.log('Confidence: ' + event.results[0][0].confidence);
-}
-
-recognition.onspeechend = function() {
-  recognition.stop();
+  console.log('Length ' + len + ', Confidence: ' + event.results[0][0].confidence);
 }
 
 recognition.onnomatch = function(event) {
@@ -56,3 +53,8 @@ recognition.onnomatch = function(event) {
 recognition.onerror = function(event) {
   diagnostic.textContent = 'Error occurred in recognition: ' + event.error;
 }
+
+recognition.onend = function() {
+    recognition.start();
+    console.log('Restarted, ready to receive a color command.');
+};
